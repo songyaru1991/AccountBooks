@@ -1,0 +1,16 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title="Home Page";
+}
+
+@helper ExternalAnchor(string href, string text) 
+{ 
+    <a href="@href" class="btn" rel="external">@text</a>
+}
+
+@ExternalAnchor("https://www.baidu.com/","Baidu")
+
+<br />
+
+@ExternalAnchor("https://mvc.tw","twMVC")
+

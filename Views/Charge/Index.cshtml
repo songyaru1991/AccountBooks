@@ -1,0 +1,13 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>我的記賬簿</h2>
+
+@*@Html.Partial("_AddCharge")*@
+<a href="/Charge/AddCharge">新增记录</a>
+<hr />
+@Html.Partial("_ChargeAmount")
+
