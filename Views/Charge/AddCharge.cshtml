@@ -1,93 +1,49 @@
-﻿@*@model AccountBooks.Models.ChargeModels
-    @{
-        Layout = "";
-    }
-
-    <div class="well">
-        <form class="form-horizontal" action="/Charge/AddCharge">
-            <div class="form-group">
-                <label for="category" class="col-sm-2 control-label">類別</label>
-                <div class="col-sm-10">
-                    <select id="category" class="form-control" name="Category">
-                        <option value="" selected>請選擇</option>
-                        <option>支出</option>
-                        <option>收入</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="money" class="col-sm-2 control-label">金額</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="money" placeholder="金額" name="Amount">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="date" class="col-sm-2 control-label">日期</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="date" placeholder="日期" name="Date">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="description" class="col-sm-2 control-label">備註</label>
-                <div class="col-sm-10">
-                    <textarea class="form-control" id="description" name="Remarks"></textarea>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-sm-offset-8 col-sm-4">
-                    <button type="submit" class="btn btn-default">送出</button>
-                </div>
-            </div>
-        </form>
-    </div>
-*@
-
-@model AccountBooks.Models.ChargeModels
+﻿@model AccountBooks.Models.ChargeModels
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    //Layout = "";
 }
-
+<h2>我的記賬簿</h2>
 <div class="well">
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true)
-    @using (Html.BeginForm("Add", "Charge", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    @using (Ajax.BeginForm("Add", "Charge", new AjaxOptions { UpdateTargetId = "ChargeList" }, new { @class = "form-horizontal" }))
     {
         <div class="form-group">
             @Html.LabelFor(m => m.Category, new { @class = "col-sm-2 control-label" })
-            <div class="col-md-10">
+            <div class="col-sm-10">
                 @Html.DropDownListFor(m => m.Category, new List<SelectListItem>
                     {
-                     (new SelectListItem() {Text = "请选择", Value = "0", Selected = true}),
+                     //(new SelectListItem() {Text = "请选择", Value = "0", Selected = true}),
                      (new SelectListItem() {Text = "收入", Value = "1"}),
                      (new SelectListItem() {Text = "支出", Value = "2"})
-                    })
+                    }, new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.Category, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="form-group">
             @Html.LabelFor(m => m.Amount, new { @class = "col-sm-2 control-label" })
-            <div class="col-md-10">
-                @Html.EditorFor(m => m.Amount, new { @class = "form-control" })
+            <div class="col-sm-10">
+                @Html.TextBoxFor(m => m.Amount, new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.Amount, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="form-group">
-            @Html.LabelFor(m => m.Date, new { @class = "col-sm-2 control-label" })
-            <div class="col-md-10">
-                @Html.EditorFor(m => m.Date, new { @class = "form-control" })
+            @Html.LabelFor(m => m.Date, new {@class = "col-sm-2 control-label" })
+            <div class="col-sm-10">
+                @Html.TextBoxFor(m => m.Date, new { @id = "Date", @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.Date, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(m => m.Remarks, new { @class = "col-sm-2 control-label" })
-            <div class="col-md-10">
+            <div class="col-sm-10">
                 @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.Remarks, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="form-group">
-            <div class="col-md-10">
+            <div class="col-sm-10">
                 <button type="submit" class="btn btn-default">送出</button>
             </div>
         </div>

@@ -10,13 +10,14 @@ namespace AccountBooks.Repository
 {
     public class UnitOfWork : IUnitOfWork, IDisposable   //IDisposable垃圾资源回收机制
     {
-        DataContext _dbContext;
+        public DataContext dbContext { get; set; }
+
         private bool _disposed;
         private Hashtable _repositories;
 
         public UnitOfWork()
         {
-          _dbContext = new DataContext();
+          dbContext = new DataContext();
           this._repositories = new Hashtable();
         }     
          #region  IUnitOfWork 成员
@@ -27,7 +28,7 @@ namespace AccountBooks.Repository
             if (!this._repositories.ContainsKey(typeName))
             {
                 var paramDict = new Dictionary<string, object>();
-                paramDict.Add("context", this._dbContext);
+                paramDict.Add("context", this.dbContext);
 
                 //Repository接口的实现统一在UnitOfWork中执行，通过Unity来实现IOC，同时把IDbContext的实现通过构造函数参数的方式传入
                 var repositoryInstance = UnityConfig.Resolve<IRepository<T>>(paramDict);
@@ -40,7 +41,7 @@ namespace AccountBooks.Repository
 
         public void Commit()
         {
-            this._dbContext.SaveChanges();
+            this.dbContext.SaveChanges();
         }
 
         #endregion
@@ -50,7 +51,7 @@ namespace AccountBooks.Repository
         {
             if (!this._disposed)
                 if (disposing)
-                    this._dbContext.Dispose();
+                    this.dbContext.Dispose();
 
             this._disposed = true;
         }

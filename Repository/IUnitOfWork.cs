@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AccountBooks.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,7 +13,8 @@ namespace AccountBooks.Repository
     public interface IUnitOfWork : IDisposable
     {
         #region
-        IRepository<T> Repository<T>() where T : class;    
+  //      IRepository<T> Repository<T>() where T : class;
+        DataContext dbContext{ get; set; }
         void Commit();
 //        void Save();
         #endregion

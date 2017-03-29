@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using AccountBooks.Models;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace AccountBooks.Controllers
 {
@@ -153,10 +154,23 @@ namespace AccountBooks.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
+                IdentityResult result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+
+                    //增加用户角色管理，新增用户为非管理员权限
+                   // var roleName = "Admin";
+                    var roleName = "Users";
+                    //判断角色是否存在
+                    if (HttpContext.GetOwinContext().Get<ApplicationRoleManager>().RoleExists(roleName) == false) 
+                    {
+                        //角色不存在，建立角色
+                        var role = new IdentityRole(roleName);
+                        await HttpContext.GetOwinContext().Get<ApplicationRoleManager>().CreateAsync(role);
+                    }
+                    //将使用者加入该角色
+                    await UserManager.AddToRoleAsync(user.Id, roleName);
                     
                     // 有关如何启用帐户确认和密码重置的详细信息，请访问 http://go.microsoft.com/fwlink/?LinkID=320771
                     // 发送包含此链接的电子邮件

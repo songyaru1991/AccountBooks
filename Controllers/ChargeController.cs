@@ -18,25 +18,30 @@ namespace AccountBooks.Controllers
             chargeService = new ChargeService(unitOfWork);
         }
         // GET: /Charge/
-        int pageSize = 2;
+        int pageSize = 5;
+
+        [Authorize(Roles = "Admin")]
         public ActionResult Index(int pageNumber = 1)
         {
             //PagedList<ChargeModels> lst = context.Charge.OrderBy(p => p.Id).ToPagedList(pageNumber, pageSize);
             IEnumerable<ChargeModels> lst = chargeService.ShowAllRecordsByPagination(pageNumber, pageSize);
-            return View(lst);
+            return View(lst);     
         }
 
-        [HttpPost]
-        public ActionResult ChargeAmount(ChargeModels chargeItem)
-        {
-            return View(chargeItem);
-        }
 
-        public ActionResult AddCharge(ChargeModels charge)
+        public ActionResult AddCharge()
         {
             return View();
         }
-
+        /* ValidationMessage的误触发 
+         * 错误的验证是在ModelState去取的，所以对于Action的参数的Model要注意
+         * Action有参数时页面上class="input-validation-error"
+         * 无参数时则为正常class="field-validation-valid"
+         public ActionResult AddCharge(ChargeModels charge)
+        {
+            return View();
+        }  
+        */
         public ActionResult Add(ChargeModels charge)
         {
             if (ModelState.IsValid)
@@ -47,7 +52,7 @@ namespace AccountBooks.Controllers
                 }
                 else
                 {
-                    return Content("<script>alert('新增失败!');location.href='../Charge/Index';</script>");
+                    return Content("<script>alert('新增失败!');location.href='../Charge/AddCharge';</script>");
                 }
             }
             else

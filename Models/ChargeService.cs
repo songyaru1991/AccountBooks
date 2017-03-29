@@ -17,37 +17,22 @@ namespace AccountBooks.Models
         public ChargeService(IUnitOfWork UnitOfWork)
         {
             _unitWork = UnitOfWork;
-            _accountBookRep = new Repository<ChargeModels>();
+            _accountBookRep = new Repository<ChargeModels>(UnitOfWork);
         }
 
         public IEnumerable<ChargeModels> ShowAllRecordsByPagination(int pageNumber, int pageSize)
         {           
+            
             return _accountBookRep.ShowAllRecordsByPagination(pageNumber, pageSize);
         }
 
         public bool Add(ChargeModels charge)
-        {
-            //var isAdd = new bool();
-            //using (this._unitWork)
-            //{
-            //    _accountBookRep = this.UnitofWork.Repository<ChargeModels>();
-
-            //    //添加到内存中
-            //    context.Products.Add(pro);
-            //    //保存到数据库中
-            //    bool isAdd = context.SaveChanges() > 0 ? true : false;
-
-            //    _accountBookRep.Add(charge);
-            //    this._unitWork.Commit();
-            //}
-            //isAdd = true;
-            //return isAdd;
-
+        {           
             var chargeRecord = new ChargeModels()
             {
                 Id = Guid.NewGuid(),
                 Amount = charge.Amount,
-                Category = charge.Category,
+                Category=charge.Category,
                 Date = charge.Date,
                 Remarks = charge.Remarks
             };

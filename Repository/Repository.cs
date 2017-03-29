@@ -11,15 +11,15 @@ namespace AccountBooks.Repository
 {
     public class Repository<T>:IRepository<T> where T:class
     {
-   //     public IUnitOfWork UnitOfWork { get; set; }
+        public IUnitOfWork UnitOfWork { get; set; }
         private readonly DataContext _db;
         private readonly DbSet<T> _dbSet;
         #region 构造函数
-        public Repository()
+        public Repository(IUnitOfWork unitOfWork)
         {
-            this._db = new DataContext();
+            this._db = unitOfWork.dbContext;
             this._dbSet = this._db.Set<T>();
- //           UnitOfWork = unitOfWork;
+            UnitOfWork = unitOfWork;
         }
         #endregion
 
@@ -28,15 +28,6 @@ namespace AccountBooks.Repository
         {
             this._dbSet.Add(item);
         }
-
-        //public bool AddCharge(ChargeModels charge)
-        //{
-        //    _db.Charge.Add(charge);
-        //    //以下方法要改写
-        //    //  bool isAdd = _db.SaveChanges() > 0 ? true : false;
-        //    bool isAdd = UnitOfWork.Save() > 0 ? true : false;
-        //    return isAdd;
-        //}
 
         public void Remove(T item)
         {
@@ -94,7 +85,7 @@ namespace AccountBooks.Repository
 
         PagedList<ChargeModels> IRepository<T>.ShowAllRecordsByPagination(int pageNumber, int pageSize)
         {
-            PagedList<ChargeModels> lst= _db.Charge.OrderBy(p => p.Id).ToPagedList(pageNumber, pageSize);
+            PagedList<ChargeModels> lst= _db.Charge.OrderBy(p => p.Date).ToPagedList(pageNumber, pageSize);
             return lst;
         }
 

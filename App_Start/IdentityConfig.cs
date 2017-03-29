@@ -11,6 +11,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using AccountBooks.Models;
+using System.Web.Helpers;
 
 namespace AccountBooks
 {
@@ -18,7 +19,15 @@ namespace AccountBooks
     {
         public Task SendAsync(IdentityMessage message)
         {
-            // 在此处插入电子邮件服务可发送电子邮件。
+            /* 
+            在此处插入电子邮件服务可发送电子邮件。
+             * 再把AccountController内的Register的Post方法中原先的注释程式打开
+            WebMail.SmtpPort = 25;
+            WebMail.SmtpServer = "您的SMTP位置";
+            WebMail.UserName = "寄件账号";
+            WebMail.Password = "寄件密码";
+            WebMail.Send(message.Destination, message.Subject, message.Body);
+            */
             return Task.FromResult(0);
         }
     }
@@ -46,18 +55,18 @@ namespace AccountBooks
             // 配置用户名的验证逻辑
             manager.UserValidator = new UserValidator<ApplicationUser>(manager)
             {
-                AllowOnlyAlphanumericUserNames = false,
-                RequireUniqueEmail = true
+                AllowOnlyAlphanumericUserNames = false,       //允许使用者名称只有数字
+                RequireUniqueEmail = true                     //  电子邮箱必须是唯一的  
             };
 
             // 配置密码的验证逻辑
-            manager.PasswordValidator = new PasswordValidator
+            manager.PasswordValidator = new PasswordValidator 
             {
-                RequiredLength = 6,
-                RequireNonLetterOrDigit = true,
-                RequireDigit = true,
-                RequireLowercase = true,
-                RequireUppercase = true,
+                RequiredLength = 6,                           //密码最小长度
+                RequireNonLetterOrDigit = true,               //必须包含特殊字符
+                RequireDigit = true,                          //必须包含数字
+                RequireLowercase = true,                      //必须包含小写字母
+                RequireUppercase = true,                      //必须包含大写字母
             };
 
             // 配置用户锁定默认值
@@ -105,5 +114,25 @@ namespace AccountBooks
         {
             return new ApplicationSignInManager(context.GetUserManager<ApplicationUserManager>(), context.Authentication);
         }
+
     }
+
+    /// <summary>
+    /// 角色管理员
+    /// </summary>
+    public class ApplicationRoleManager:RoleManager<IdentityRole>
+    {
+        public ApplicationRoleManager(IRoleStore<IdentityRole,string> roleStore)
+            :base(roleStore)
+        {
+        }
+
+        public static ApplicationRoleManager Create(IdentityFactoryOptions
+            <ApplicationRoleManager> options, IOwinContext context)
+        {
+            return new ApplicationRoleManager(new RoleStore<IdentityRole>
+                (context.Get<ApplicationDbContext>()));
+        }
+    }
+
 }
