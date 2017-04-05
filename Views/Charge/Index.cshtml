@@ -1,65 +1,12 @@
-﻿@model PagedList<AccountBooks.Models.ChargeModels>
-@using Webdiyer.WebControls.Mvc;
-
+﻿
 @{
     ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "";
 }
-
-<h2>我的記賬簿</h2>
 
 @*<a href="/Charge/AddCharge">新增记录</a>*@
-@Html.ActionLink("新增记录", "AddCharge", "Charge")
-@*@Html.Action("AddCharge")*@
+
+@*@Html.Partial("_AddCharge")*@
 <hr />
-
-@helper changeCategoryTextColor(string Category)
-{
-    if (Category.Equals("1"))
-    {
-        <td class="text-danger">收入</td>
-    }
-    else
-    {
-        <td class="text-info">支出</td>
-    }
-}
-
-<div>
-    <table id="ChargeList" class="table table-striped">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>類別</th>
-                <th>日期</th>
-                <th>金額</th>
-                <th>備註</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var chargeItem in Model)
-            {
-                var index = Model.IndexOf(chargeItem) + 1;
-                <tr>
-                    <td>@index</td>
-
-                    <td>@changeCategoryTextColor(@chargeItem.Category)</td>
-
-                    <td>@string.Format("{0:yyyy-MM-dd}", chargeItem.Date)</td>
-
-                    @*<td>@string.Format("{0:C}", chargeItem.Amount)</td>{0:C}转化成货币型*@
-                    <td>￥@chargeItem.Amount.ToString("#,###")</td>
-                    <td>
-                        <textarea cols="50" rows="5">
-                            @chargeItem.Remarks
-                        </textarea>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    @Html.Pager(Model, new PagerOptions { PageIndexParameterName = "pageNumber" })
-</div>
-
-
+@*@{Html.RenderAction("ChargeAmount","Charge");}*@
+@Html.Action("ChargeAmount")

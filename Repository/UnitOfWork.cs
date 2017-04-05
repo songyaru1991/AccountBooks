@@ -39,9 +39,9 @@ namespace AccountBooks.Repository
             return (IRepository<T>)this._repositories[typeName];
         }
 
-        public void Commit()
+        public bool Commit()
         {
-            this.dbContext.SaveChanges();
+          return this.dbContext.SaveChanges() > 0 ? true : false;
         }
 
         #endregion

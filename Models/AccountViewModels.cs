@@ -1,13 +1,12 @@
-﻿using AccountBooks.ValidateAttribute;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace AccountBooks.Models
+namespace IdentitySample.Models
 {
     public class ExternalLoginConfirmationViewModel
     {
         [Required]
-        [Display(Name = "电子邮件")]
+        [Display(Name = "Email")]
         public string Email { get; set; }
     }
 
@@ -21,7 +20,6 @@ namespace AccountBooks.Models
         public string SelectedProvider { get; set; }
         public ICollection<System.Web.Mvc.SelectListItem> Providers { get; set; }
         public string ReturnUrl { get; set; }
-        public bool RememberMe { get; set; }
     }
 
     public class VerifyCodeViewModel
@@ -30,59 +28,53 @@ namespace AccountBooks.Models
         public string Provider { get; set; }
 
         [Required]
-        [Display(Name = "代码")]
+        [Display(Name = "Code")]
         public string Code { get; set; }
         public string ReturnUrl { get; set; }
 
-        [Display(Name = "记住此浏览器?")]
+        [Display(Name = "Remember this browser?")]
         public bool RememberBrowser { get; set; }
-
-        public bool RememberMe { get; set; }
     }
 
     public class ForgotViewModel
     {
         [Required]
-        [Display(Name = "电子邮件")]
+        [Display(Name = "Email")]
         public string Email { get; set; }
     }
 
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "电子邮件")]
+        [Display(Name = "Email")]
         [EmailAddress]
-        [RegularExpression(@"^((?!.*skilltree|.*demo|.*twMVC).)*$", ErrorMessage = "邮箱不能包含skilltree,demo,twMVC字符")]     
         public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        [Display(Name = "密码")]
-        [StringLength(20, ErrorMessage = "{0} 的长度在 {2} 到{1}之间。", MinimumLength = 4)]
+        [Display(Name = "Password")]
         public string Password { get; set; }
 
-        [Display(Name = "记住我?")]
+        [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
     }
 
     public class RegisterViewModel
     {
         [Required]
-       // [DataType(DataType.EmailAddress)]
         [EmailAddress]
-        [Display(Name = "电子邮件")]
-        [RegularExpression(@"^((?!.*skilltree|.*demo|.*twMVC).)*$",ErrorMessage = "邮箱不能包含skilltree,demo,twMVC字符")]     
+        [Display(Name = "Email")]
         public string Email { get; set; }
 
         [Required]
-        [StringLength(20, ErrorMessage = "{0} 的长度在 {2} 到{1}之间。", MinimumLength = 4)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "密码")]
+        [Display(Name = "Password")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "确认密码")]
-        [Compare("Password", ErrorMessage = "密码和确认密码不匹配。")]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
     }
 
@@ -90,18 +82,18 @@ namespace AccountBooks.Models
     {
         [Required]
         [EmailAddress]
-        [Display(Name = "电子邮件")]
+        [Display(Name = "Email")]
         public string Email { get; set; }
 
         [Required]
-        [StringLength(20, ErrorMessage = "{0} 的长度在 {2} 到{1}之间。", MinimumLength = 4)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "密码")]
+        [Display(Name = "Password")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "确认密码")]
-        [Compare("Password", ErrorMessage = "密码和确认密码不匹配。")]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
         public string Code { get; set; }
@@ -111,7 +103,7 @@ namespace AccountBooks.Models
     {
         [Required]
         [EmailAddress]
-        [Display(Name = "电子邮件")]
+        [Display(Name = "Email")]
         public string Email { get; set; }
     }
 }

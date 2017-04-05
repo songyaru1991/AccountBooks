@@ -38,11 +38,33 @@ namespace AccountBooks.Models
             };
 
             _accountBookRep.Add(chargeRecord);
-            this._unitWork.Commit();
 
-            var isAdd = new bool();
-            isAdd = true;
+            var isAdd = this._unitWork.Commit();
             return isAdd;
         }
+
+        public bool DelectCharge(Guid id)
+        {
+            ChargeModels charge = _unitWork.dbContext.Charge.Find(id);
+            _accountBookRep.Remove(charge);
+
+            var isDelect = this._unitWork.Commit();
+            return isDelect;
+        }
+
+        public ChargeModels EditItem(Guid id)
+        {
+            ChargeModels charge = _unitWork.dbContext.Charge.Find(id);
+            return charge;
+        }
+
+        public bool EditCharge(ChargeModels charge)
+        {
+            _accountBookRep.Modify(charge);
+
+            bool isEdit = this._unitWork.Commit();
+            return isEdit;
+        }
+
     }
 }

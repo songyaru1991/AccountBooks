@@ -1,24 +1,22 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
+using IdentitySample.Models;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using AccountBooks.Models;
-using Microsoft.AspNet.Identity.EntityFramework;
+using AccountBooks.Filter;
 
-namespace AccountBooks.Controllers
+namespace IdentitySample.Controllers
 {
+   
     [Authorize]
     public class AccountController : Controller
     {
-        private ApplicationSignInManager _signInManager;
-        private ApplicationUserManager _userManager;
-
         public AccountController()
         {
         }
@@ -29,18 +27,7 @@ namespace AccountBooks.Controllers
             SignInManager = signInManager;
         }
 
-        public ApplicationSignInManager SignInManager
-        {
-            get
-            {
-                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-            }
-            private set 
-            { 
-                _signInManager = value; 
-            }
-        }
-
+        private ApplicationUserManager _userManager;
         public ApplicationUserManager UserManager
         {
             get
@@ -53,19 +40,44 @@ namespace AccountBooks.Controllers
             }
         }
 
+        //保存Cookie
+        //此Action自动往cookie里写入登录信息 
+        public void CreateCookie()
+        {
+            HttpCookie UserName = new HttpCookie("name");
+            UserName.Value = Request["userName"];
+            System.Web.HttpContext.Current.Response.SetCookie(UserName);
+            //cookie保存时间
+            UserName.Expires = DateTime.Now.AddMinutes(10);
+        }
+
+
         //
         // GET: /Account/Login
-        [AllowAnonymous]
+        [AllowAnonymous]           //其属性是一种不执行Authorize属性的例外情况
+        [NoAuthentication]
         public ActionResult Login(string returnUrl)
         {
-            ViewBag.ReturnUrl = returnUrl;   
+            ViewBag.ReturnUrl = returnUrl;
             return View();
+        }
+
+        private ApplicationSignInManager _signInManager;
+
+        public ApplicationSignInManager SignInManager
+        {
+            get
+            {
+                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
+            }
+            private set { _signInManager = value; }
         }
 
         //
         // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
+        [NoAuthentication]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
@@ -74,21 +86,21 @@ namespace AccountBooks.Controllers
                 return View(model);
             }
 
-            // 这不会计入到为执行帐户锁定而统计的登录失败次数中
-            // 若要在多次输入错误密码的情况下触发帐户锁定，请更改为 shouldLockout: true
+            // This doen't count login failures towards lockout only two factor authentication
+            // To enable password failures to trigger lockout, change to shouldLockout: true
             var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
                 case SignInStatus.Success:
-                    return Content("<script>alert('登录成功!');location.href='../Home/index';</script>");
-                  //  return RedirectToLocal(returnUrl);
+                    Session["userName"] = model.Email;
+                    return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl });
                 case SignInStatus.Failure:
                 default:
-                    ModelState.AddModelError("", "无效的登录尝试。");
+                    ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
             }
         }
@@ -96,20 +108,27 @@ namespace AccountBooks.Controllers
         //
         // GET: /Account/VerifyCode
         [AllowAnonymous]
-        public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
+        [NoAuthentication]
+        public async Task<ActionResult> VerifyCode(string provider, string returnUrl)
         {
-            // 要求用户已通过使用用户名/密码或外部登录名登录
+            // Require that the user has already logged in via username/password or external login
             if (!await SignInManager.HasBeenVerifiedAsync())
             {
                 return View("Error");
             }
-            return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
+            var user = await UserManager.FindByIdAsync(await SignInManager.GetVerifiedUserIdAsync());
+            if (user != null)
+            {
+                ViewBag.Status = "For DEMO purposes the current " + provider + " code is: " + await UserManager.GenerateTwoFactorTokenAsync(user.Id, provider);
+            }
+            return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl });
         }
 
         //
         // POST: /Account/VerifyCode
         [HttpPost]
         [AllowAnonymous]
+        [NoAuthentication]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> VerifyCode(VerifyCodeViewModel model)
         {
@@ -118,11 +137,7 @@ namespace AccountBooks.Controllers
                 return View(model);
             }
 
-            // 以下代码可以防范双重身份验证代码遭到暴力破解攻击。
-            // 如果用户输入错误代码的次数达到指定的次数，则会将
-            // 该用户帐户锁定指定的时间。
-            // 可以在 IdentityConfig 中配置帐户锁定设置
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: false, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -131,7 +146,7 @@ namespace AccountBooks.Controllers
                     return View("Lockout");
                 case SignInStatus.Failure:
                 default:
-                    ModelState.AddModelError("", "代码无效。");
+                    ModelState.AddModelError("", "Invalid code.");
                     return View(model);
             }
         }
@@ -139,6 +154,7 @@ namespace AccountBooks.Controllers
         //
         // GET: /Account/Register
         [AllowAnonymous]
+        [NoAuthentication]
         public ActionResult Register()
         {
             return View();
@@ -148,48 +164,33 @@ namespace AccountBooks.Controllers
         // POST: /Account/Register
         [HttpPost]
         [AllowAnonymous]
+        [NoAuthentication]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                IdentityResult result = await UserManager.CreateAsync(user, model.Password);
+                var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-
-                    //增加用户角色管理，新增用户为非管理员权限
-                   // var roleName = "Admin";
-                    var roleName = "Users";
-                    //判断角色是否存在
-                    if (HttpContext.GetOwinContext().Get<ApplicationRoleManager>().RoleExists(roleName) == false) 
-                    {
-                        //角色不存在，建立角色
-                        var role = new IdentityRole(roleName);
-                        await HttpContext.GetOwinContext().Get<ApplicationRoleManager>().CreateAsync(role);
-                    }
-                    //将使用者加入该角色
-                    await UserManager.AddToRoleAsync(user.Id, roleName);
-                    
-                    // 有关如何启用帐户确认和密码重置的详细信息，请访问 http://go.microsoft.com/fwlink/?LinkID=320771
-                    // 发送包含此链接的电子邮件
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "确认你的帐户", "请通过单击 <a href=\"" + callbackUrl + "\">這裏</a>来确认你的帐户");
-
-                    return RedirectToAction("Index", "Home");
+                    var code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">link</a>");
+                    ViewBag.Link = callbackUrl;
+                    return View("DisplayEmail");
                 }
                 AddErrors(result);
             }
 
-            // 如果我们进行到这一步时某个地方出错，则重新显示表单
+            // If we got this far, something failed, redisplay form
             return View(model);
         }
 
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
+        [NoAuthentication]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
             if (userId == null || code == null)
@@ -203,6 +204,7 @@ namespace AccountBooks.Controllers
         //
         // GET: /Account/ForgotPassword
         [AllowAnonymous]
+        [NoAuthentication]
         public ActionResult ForgotPassword()
         {
             return View();
@@ -212,6 +214,7 @@ namespace AccountBooks.Controllers
         // POST: /Account/ForgotPassword
         [HttpPost]
         [AllowAnonymous]
+        [NoAuthentication]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
@@ -220,25 +223,25 @@ namespace AccountBooks.Controllers
                 var user = await UserManager.FindByNameAsync(model.Email);
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
-                    // 请不要显示该用户不存在或者未经确认
+                    // Don't reveal that the user does not exist or is not confirmed
                     return View("ForgotPasswordConfirmation");
                 }
 
-                // 有关如何启用帐户确认和密码重置的详细信息，请访问 http://go.microsoft.com/fwlink/?LinkID=320771
-                // 发送包含此链接的电子邮件
-                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                // await UserManager.SendEmailAsync(user.Id, "重置密码", "请通过单击 <a href=\"" + callbackUrl + "\">此处</a>来重置你的密码");
-                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                var code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
+                ViewBag.Link = callbackUrl;
+                return View("ForgotPasswordConfirmation");
             }
 
-            // 如果我们进行到这一步时某个地方出错，则重新显示表单
+            // If we got this far, something failed, redisplay form
             return View(model);
         }
 
         //
         // GET: /Account/ForgotPasswordConfirmation
         [AllowAnonymous]
+        [NoAuthentication]
         public ActionResult ForgotPasswordConfirmation()
         {
             return View();
@@ -247,6 +250,7 @@ namespace AccountBooks.Controllers
         //
         // GET: /Account/ResetPassword
         [AllowAnonymous]
+        [NoAuthentication]
         public ActionResult ResetPassword(string code)
         {
             return code == null ? View("Error") : View();
@@ -256,6 +260,7 @@ namespace AccountBooks.Controllers
         // POST: /Account/ResetPassword
         [HttpPost]
         [AllowAnonymous]
+        [NoAuthentication]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
         {
@@ -266,7 +271,7 @@ namespace AccountBooks.Controllers
             var user = await UserManager.FindByNameAsync(model.Email);
             if (user == null)
             {
-                // 请不要显示该用户不存在
+                // Don't reveal that the user does not exist
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
             var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
@@ -281,6 +286,7 @@ namespace AccountBooks.Controllers
         //
         // GET: /Account/ResetPasswordConfirmation
         [AllowAnonymous]
+        [NoAuthentication]
         public ActionResult ResetPasswordConfirmation()
         {
             return View();
@@ -290,17 +296,19 @@ namespace AccountBooks.Controllers
         // POST: /Account/ExternalLogin
         [HttpPost]
         [AllowAnonymous]
+        [NoAuthentication]
         [ValidateAntiForgeryToken]
         public ActionResult ExternalLogin(string provider, string returnUrl)
         {
-            // 请求重定向到外部登录提供程序
+            // Request a redirect to the external login provider
             return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
         }
 
         //
         // GET: /Account/SendCode
         [AllowAnonymous]
-        public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
+        [NoAuthentication]
+        public async Task<ActionResult> SendCode(string returnUrl)
         {
             var userId = await SignInManager.GetVerifiedUserIdAsync();
             if (userId == null)
@@ -309,13 +317,14 @@ namespace AccountBooks.Controllers
             }
             var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
             var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
-            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
+            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl });
         }
 
         //
         // POST: /Account/SendCode
         [HttpPost]
         [AllowAnonymous]
+        [NoAuthentication]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SendCode(SendCodeViewModel model)
         {
@@ -324,17 +333,18 @@ namespace AccountBooks.Controllers
                 return View();
             }
 
-            // 生成令牌并发送该令牌
+            // Generate the token and send it
             if (!await SignInManager.SendTwoFactorCodeAsync(model.SelectedProvider))
             {
                 return View("Error");
             }
-            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl });
         }
 
         //
         // GET: /Account/ExternalLoginCallback
         [AllowAnonymous]
+        [NoAuthentication]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
@@ -343,7 +353,7 @@ namespace AccountBooks.Controllers
                 return RedirectToAction("Login");
             }
 
-            // 如果用户已具有登录名，则使用此外部登录提供程序将该用户登录
+            // Sign in the user with this external login provider if the user already has a login
             var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false);
             switch (result)
             {
@@ -352,10 +362,10 @@ namespace AccountBooks.Controllers
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
+                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl });
                 case SignInStatus.Failure:
                 default:
-                    // 如果用户没有帐户，则提示该用户创建帐户
+                    // If the user does not have an account, then prompt the user to create an account
                     ViewBag.ReturnUrl = returnUrl;
                     ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
                     return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
@@ -366,6 +376,7 @@ namespace AccountBooks.Controllers
         // POST: /Account/ExternalLoginConfirmation
         [HttpPost]
         [AllowAnonymous]
+        [NoAuthentication]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
         {
@@ -376,7 +387,7 @@ namespace AccountBooks.Controllers
 
             if (ModelState.IsValid)
             {
-                // 从外部登录提供程序获取有关用户的信息
+                // Get the information about the user from the external login provider
                 var info = await AuthenticationManager.GetExternalLoginInfoAsync();
                 if (info == null)
                 {
@@ -406,40 +417,25 @@ namespace AccountBooks.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
-            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            AuthenticationManager.SignOut();
+            if (Session["userName"] != null)
+            {
+                Session["userName"] = null;
+            }
             return RedirectToAction("Index", "Home");
         }
 
         //
         // GET: /Account/ExternalLoginFailure
         [AllowAnonymous]
+        [NoAuthentication]
         public ActionResult ExternalLoginFailure()
         {
             return View();
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_userManager != null)
-                {
-                    _userManager.Dispose();
-                    _userManager = null;
-                }
-
-                if (_signInManager != null)
-                {
-                    _signInManager.Dispose();
-                    _signInManager = null;
-                }
-            }
-
-            base.Dispose(disposing);
-        }
-
-        #region 帮助程序
-        // 用于在添加外部登录名时提供 XSRF 保护
+        #region Helpers
+        // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
         private IAuthenticationManager AuthenticationManager

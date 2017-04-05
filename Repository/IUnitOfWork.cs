@@ -15,7 +15,7 @@ namespace AccountBooks.Repository
         #region
   //      IRepository<T> Repository<T>() where T : class;
         DataContext dbContext{ get; set; }
-        void Commit();
+        bool Commit();
 //        void Save();
         #endregion
     }

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-
-namespace AccountBooks.Controllers
+﻿using System.Web.Mvc;
+using AccountBooks.Filter;
+namespace IdentitySample.Controllers
 {
     public class HomeController : Controller
     {
@@ -13,9 +9,10 @@ namespace AccountBooks.Controllers
             return View();
         }
 
+        [Authorize]
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+            ViewBag.Message = "Your app description page.";
 
             return View();
         }
@@ -24,6 +21,11 @@ namespace AccountBooks.Controllers
         {
             ViewBag.Message = "Your contact page.";
 
+            return View();
+        }
+
+        public ActionResult Error401()
+        {
             return View();
         }
     }

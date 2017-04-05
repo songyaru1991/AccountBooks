@@ -20,8 +20,8 @@ namespace AccountBooks.Models
 
             [Required]
             [Display(Name = "金額")]
-            [RegularExpression(@"^[0-9]*[1-9][0-9]*$", ErrorMessage = "金額只能輸入正整數 ")]
-         //   [Range(1, int.MaxValue, ErrorMessage = "金額必需大於0元")]
+          //  [RegularExpression(@"^[0-9]*[1-9][0-9]*$", ErrorMessage = "金額只能輸入正整數 ")]
+            [Range(1, int.MaxValue, ErrorMessage = "金額需是大於0元，小于2147483647的整数")]
             public int Amount { get; set; }
 
             [Required]
