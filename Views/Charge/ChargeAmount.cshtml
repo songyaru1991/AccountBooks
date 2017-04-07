@@ -1,61 +1,69 @@
-﻿@model PagedList<AccountBooks.Models.ChargeModels>
-@using Webdiyer.WebControls.Mvc;
-
+﻿@model PagedList<ChargeModels>
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "";
 }
-
 <h2>我的記賬簿</h2>
 
-@Html.Action("AddCharge")
+@*<div class="well well-sm">当前查询条件：种类：<span class="emph">@Request.QueryString["Category"]</span></div>*@
 
 @helper changeCategoryTextColor(string Category)
 {
-    if (Category.Equals("1"))
+    if (Category.Equals("收入"))
     {
         <p class="text-danger">收入</p>
     }
-    else
+    if (Category.Equals("支出"))
     {
         <p class="text-info">支出</p>
     }
 }
-
-    <table id="ChargeList" class="table table-striped">
-        <thead>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>序号</th>
+            <th>类别</th>
+            <th>日期</th>
+            <th>金额</th>
+            <th>备注</th>
+            <th colspan="2">编辑</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{int i = 0;}
+        @foreach (var chargeItem in Model)
+        {
+            // var index = Model.IndexOf(chargeItem) + 1;
+            var index = Model.StartItemIndex + i++;
             <tr>
-                <th>#</th>
-                <th>类别</th>
-                <th>日期</th>
-                <th>金额</th>
-                <th>备注</th>
-                <th colspan="2">编辑</th>
+                <td>@index</td>
+
+                <td>@changeCategoryTextColor(@chargeItem.Category)</td>
+
+                <td>@string.Format("{0:yyyy-MM-dd}", chargeItem.Date)</td>
+
+                @*<td>@string.Format("{0:C}", chargeItem.Amount)</td>{0:C}转化成货币型*@
+                <td>￥@chargeItem.Amount.ToString("#,###")</td>
+                <td>
+                    <textarea cols="50" rows="5">
+                        @chargeItem.Remarks
+                    </textarea>
+                </td>
+                <td>
+                    <a href="/Charge/Delete/@chargeItem.Id" onclick="return confirm('确认删除')">删除</a>
+                    <a href="/Charge/Edit/@chargeItem.Id">修改</a>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var chargeItem in Model)
-            {
-                var index = Model.IndexOf(chargeItem) + 1;
-                <tr>
-                    <td>@index</td>
+        }
+    </tbody>
+</table>
 
-                    <td>@changeCategoryTextColor(@chargeItem.Category)</td>
 
-                    <td>@string.Format("{0:yyyy-MM-dd}", chargeItem.Date)</td>
+@*ajax标准分页*@
+@*<div class="text-center">
+    @Ajax.Pager(Model, new PagerOptions { PageIndexParameterName = "pageNumber", ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"javascript:void(0);\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>" }).AjaxOptions(a => a.SetUpdateTargetId("ChargeList").SetDataFormId("searchForm"))
+</div>*@
 
-                    @*<td>@string.Format("{0:C}", chargeItem.Amount)</td>{0:C}转化成货币型*@
-                    <td>￥@chargeItem.Amount.ToString("#,###")</td>
-                    <td>
-                        <textarea cols="50" rows="5">
-                            @chargeItem.Remarks
-                        </textarea>
-                    </td>
-                    <td><a href="/Charge/Delete/@chargeItem.Id" onclick="return confirm('确认删除')">删除</a>
-                        <a href="/Charge/Edit/@chargeItem.Id">修改</a></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-@Html.Pager(Model, new PagerOptions { PageIndexParameterName = "pageNumber" })
-
+<div>
+    <div style="float:left;width:50%">共 @Model.TotalPageCount 页 @Model.TotalItemCount 条记录，当前为第 @Model.CurrentPageIndex 页</div>
+    @Ajax.Pager(Model).Options(o => o.SetPageIndexParameterName("pageNumber").AddHtmlAttribute("style", "float:right").SetPagerItemTemplate("&nbsp;{0}")).AjaxOptions(a => a.SetUpdateTargetId("ChargeList").SetDataFormId("searchForm"))
+</div>

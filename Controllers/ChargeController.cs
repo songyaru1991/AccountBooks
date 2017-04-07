@@ -4,9 +4,9 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using AccountBooks.Models;
-using Webdiyer.WebControls.Mvc;
 using AccountBooks.Repository;
 using AccountBooks.Filter;
+using Webdiyer.WebControls.Mvc;
 
 namespace AccountBooks.Controllers
 {
@@ -23,16 +23,35 @@ namespace AccountBooks.Controllers
 
        // [Authorize(Roles = "Admin")]
         public ActionResult Index()
-        {         
-            return View();   
+        {
+            return View();         
+        }
+
+        public ActionResult ChargeAmount( string Category, int pageNumber=1)
+        {
+
+            var model = chargeService.ajaxSearchGetResult(Category, pageSize, pageNumber);
+            if (Request.IsAjaxRequest())
+                return View(model);
+            return View(model);
+
         }
        
        // [ChildActionOnly]
-        public ActionResult ChargeAmount(int pageNumber = 1)
-        {
-            IEnumerable<ChargeModels> lst = chargeService.ShowAllRecordsByPagination(pageNumber, pageSize);
-            return View(lst);
-        }
+        //public ActionResult ChargeAmount(int pageNumber = 1)
+        //{
+        //    IEnumerable<ChargeModels> lst = chargeService.ShowAllRecordsByPagination(pageNumber, pageSize);
+        //    return View(lst);
+        //}
+
+        //public ActionResult AjaxSearchGet(string Category, int pageNumber = 1)
+        //{
+        //    var model = chargeService.ajaxSearchGetResult(Category, pageSize, pageNumber);
+        //    if (Request.IsAjaxRequest())
+        //        return View("ChargeAmount", model);
+        //    return View("Index", model);
+
+        //}
 
        // [ChildActionOnly]
         public ActionResult AddCharge()

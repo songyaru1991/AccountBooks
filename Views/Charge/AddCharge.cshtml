@@ -1,6 +1,6 @@
-﻿@model AccountBooks.Models.ChargeModels
+﻿@model ChargeModels
 @{
-    Layout = "";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="well">
@@ -15,8 +15,8 @@
                 @Html.DropDownListFor(m => m.Category, new List<SelectListItem>
                     {
                    //(new SelectListItem() {Text = "请选择", Value = "0", Selected = true}),
-                     (new SelectListItem() {Text = "收入", Value = "1"}),
-                     (new SelectListItem() {Text = "支出", Value = "2"})
+                     (new SelectListItem() {Text = "收入", Value = "收入"}),
+                     (new SelectListItem() {Text = "支出", Value = "支出"})
                     }, new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.Category, "", new { @class = "text-danger" })
             </div>

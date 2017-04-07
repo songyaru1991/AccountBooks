@@ -21,9 +21,13 @@ namespace AccountBooks.Models
         }
 
         public IEnumerable<ChargeModels> ShowAllRecordsByPagination(int pageNumber, int pageSize)
-        {           
-            
+        {                     
             return _accountBookRep.ShowAllRecordsByPagination(pageNumber, pageSize);
+        }
+
+        public PagedList<ChargeModels> ajaxSearchGetResult(string Category, int pageSize, int pageNumber = 1)
+        {
+            return _accountBookRep.ajaxSearchGetResult(Category, pageSize, pageNumber);         
         }
 
         public bool Add(ChargeModels charge)
@@ -36,6 +40,10 @@ namespace AccountBooks.Models
                 Date = charge.Date,
                 Remarks = charge.Remarks
             };
+            //if (charge.Category == "1")
+            //    chargeRecord.Category = "收入";
+            //else
+            //    chargeRecord.Category = "支出";
 
             _accountBookRep.Add(chargeRecord);
 
@@ -65,6 +73,8 @@ namespace AccountBooks.Models
             bool isEdit = this._unitWork.Commit();
             return isEdit;
         }
+
+        
 
     }
 }

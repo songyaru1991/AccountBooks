@@ -89,5 +89,16 @@ namespace AccountBooks.Repository
             return lst;
         }
 
+        PagedList<ChargeModels> IRepository<T>.ajaxSearchGetResult(string Category, int pageSize, int pageNumber)
+        {
+            //List<ChargeModels> ChargeList = _db.Charge.Where(p => (string.IsNullOrEmpty(Category) ? true : p.Category.Contains(Category))).ToList();
+            //PagedList<ChargeModels> ChargePagedList = ChargeList.OrderBy(p => p.Date).ToPagedList(pageNumber, pageSize);
+            var query = _db.Charge.AsEnumerable();
+            if (!string.IsNullOrWhiteSpace(Category))
+                query = query.Where(q => q.Category.Contains(Category));
+            var model = query.OrderBy(p => p.Date).ToPagedList(pageNumber, pageSize);
+            return model;
+        }
+
     }
 }
