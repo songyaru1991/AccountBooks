@@ -22,7 +22,7 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("首页", "Index", "Home")</li>
-                    <li>@Html.ActionLink("关于", "About", "Home")</li>
+                    @*<li>@Html.ActionLink("关于", "About", "Home")</li>*@
                     <li>@Html.ActionLink("联系我们", "Contact", "Home")</li>
 
                     @if (Request.IsAuthenticated && User.IsInRole("Admin"))
@@ -59,6 +59,5 @@
         dateFormat: "yy/mm/dd"
     });
     </script>
-
 </body>
 </html>

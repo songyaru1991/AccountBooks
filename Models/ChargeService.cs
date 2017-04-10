@@ -40,10 +40,6 @@ namespace AccountBooks.Models
                 Date = charge.Date,
                 Remarks = charge.Remarks
             };
-            //if (charge.Category == "1")
-            //    chargeRecord.Category = "收入";
-            //else
-            //    chargeRecord.Category = "支出";
 
             _accountBookRep.Add(chargeRecord);
 

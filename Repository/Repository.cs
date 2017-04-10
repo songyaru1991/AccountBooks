@@ -96,7 +96,7 @@ namespace AccountBooks.Repository
             var query = _db.Charge.AsEnumerable();
             if (!string.IsNullOrWhiteSpace(Category))
                 query = query.Where(q => q.Category.Contains(Category));
-            var model = query.OrderBy(p => p.Date).ToPagedList(pageNumber, pageSize);
+            var model = query.OrderByDescending(p => p.Date).ToPagedList(pageNumber, pageSize);
             return model;
         }
 
