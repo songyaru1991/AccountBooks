@@ -51,13 +51,22 @@
     @Scripts.Render("~/bundles/datetimepicker")
     @RenderSection("scripts", required: false)
     <script>
-        $('#Date').datetimepicker({
-        lang: 'ch',
-        showOtherMonths: true,
-        hideIfNoPrevNext: true,
-        maxDate: "+0d",
-        dateFormat: "yy/mm/dd"
-    });
+        //jQuery DateTimePicker 日期和时间插件：http://www.cnblogs.com/Lau7/p/5485216.html 
+        $("#Date").datetimepicker({                       
+             lang: 'ch',
+             timepicker: true,    //时间选项
+             todayButton: true,
+             maxDate: "+0d",
+             format: 'Y/m/d H:i',
+            
+        });
+        $("#YearMonth").datetimepicker({
+            lang: 'ch',
+            timepicker: false,   
+            todayButton: true,
+            maxDate: "+0d",
+            format: 'Y/m'  
+        });
     </script>
 </body>
 </html>

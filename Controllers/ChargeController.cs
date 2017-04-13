@@ -7,6 +7,7 @@ using AccountBooks.Models;
 using AccountBooks.Repository;
 using AccountBooks.Filter;
 using Webdiyer.WebControls.Mvc;
+using System.Globalization;
 
 namespace AccountBooks.Controllers
 {
@@ -27,33 +28,23 @@ namespace AccountBooks.Controllers
             return View();         
         }
 
-        public ActionResult ChargeAmount( string Category, int pageNumber=1)
+        public ActionResult ChargeAmount(string year,string month, string Category,string selectTime, int pageNumber=1)
         {
-
-            var model = chargeService.ajaxSearchGetResult(Category, pageSize, pageNumber);
-            if (Request.IsAjaxRequest())
-                return View(model);
+            if (selectTime != null)
+            {
+                year = null;
+                month = null;
+            }
+          //  DateTime selectDate = Convert.ToDateTime(selectTime); //此方式string格式有要求，必须是yyyy-MM-dd hh:mm:ss
+            DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+            dtFormat.ShortDatePattern = "yyyy/MM";
+            DateTime selectDate = Convert.ToDateTime(selectTime, dtFormat);
+            var model = chargeService.ajaxSearchGetResult(year,month,Category,selectDate,pageSize, pageNumber);        
             return View(model);
-
         }
-       
-       // [ChildActionOnly]
-        //public ActionResult ChargeAmount(int pageNumber = 1)
-        //{
-        //    IEnumerable<ChargeModels> lst = chargeService.ShowAllRecordsByPagination(pageNumber, pageSize);
-        //    return View(lst);
-        //}
-
-        //public ActionResult AjaxSearchGet(string Category, int pageNumber = 1)
-        //{
-        //    var model = chargeService.ajaxSearchGetResult(Category, pageSize, pageNumber);
-        //    if (Request.IsAjaxRequest())
-        //        return View("ChargeAmount", model);
-        //    return View("Index", model);
-
-        //}
 
        // [ChildActionOnly]
+
         public ActionResult AddCharge()
         {
             return View();

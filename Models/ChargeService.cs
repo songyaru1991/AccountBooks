@@ -25,9 +25,9 @@ namespace AccountBooks.Models
             return _accountBookRep.ShowAllRecordsByPagination(pageNumber, pageSize);
         }
 
-        public PagedList<ChargeModels> ajaxSearchGetResult(string Category, int pageSize, int pageNumber = 1)
+        public PagedList<ChargeModels> ajaxSearchGetResult(string year, string month, string Category, DateTime selectDate, int pageSize, int pageNumber = 1)
         {
-            return _accountBookRep.ajaxSearchGetResult(Category, pageSize, pageNumber);         
+            return _accountBookRep.ajaxSearchGetResult(year, month,Category,selectDate, pageSize, pageNumber);         
         }
 
         public bool Add(ChargeModels charge)

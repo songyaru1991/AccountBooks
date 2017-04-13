@@ -27,7 +27,7 @@ namespace IdentitySample
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
-                      "~/Content/jquery.datetimepicker.css",
+                     "~/Content/jquery.datetimepicker.css",
                       "~/Content/site.css"));
         }
     }

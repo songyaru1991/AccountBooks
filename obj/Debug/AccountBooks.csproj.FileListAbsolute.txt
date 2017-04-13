@@ -4,6 +4,7 @@ D:\Projects\WEB_MVC_TEST\AccountBooks\bin\AccountBooks.pdb
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\Antlr3.Runtime.dll
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\EntityFramework.dll
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\EntityFramework.SqlServer.dll
+D:\Projects\WEB_MVC_TEST\AccountBooks\bin\log4net.dll
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\Microsoft.AspNet.Identity.Core.dll
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\Microsoft.AspNet.Identity.EntityFramework.dll
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\Microsoft.AspNet.Identity.Owin.dll
@@ -33,6 +34,7 @@ D:\Projects\WEB_MVC_TEST\AccountBooks\bin\System.Web.WebPages.Razor.dll
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\Webdiyer.MvcPager.dll
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\WebGrease.dll
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\EntityFramework.xml
+D:\Projects\WEB_MVC_TEST\AccountBooks\bin\log4net.xml
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\Microsoft.Owin.Security.xml
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\Microsoft.Practices.ServiceLocation.pdb
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\Microsoft.Practices.ServiceLocation.xml

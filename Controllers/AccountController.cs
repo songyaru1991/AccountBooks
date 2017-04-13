@@ -460,7 +460,7 @@ namespace IdentitySample.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Charge");
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult

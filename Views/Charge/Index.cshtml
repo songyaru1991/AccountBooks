@@ -5,9 +5,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <br />
-<a href="/Charge/AddCharge">新增记录</a>
+@*<a href="/Charge/AddCharge">新增记录</a>*@
 
-@*@Html.Action("AddCharge")*@
+@Html.Action("AddCharge")
 <hr />
 @*@{Html.RenderAction("ChargeAmount","Charge");}*@
 
@@ -15,7 +15,7 @@
 @*注意：为了使每次点击搜索按钮时都跳回第一页，BeginForm扩展方法中第二个参数用new RouteValueDictionary{{"id",""}}
     将页索引路由值指定为空值，否则若当前为第五页，则点击搜索按钮重新搜索后当前页仍然为第五页。*@
 <fieldset>
-    <legend>查询</legend>
+    <legend>查询和统计</legend>
     @using (Ajax.BeginForm("ChargeAmount", new RouteValueDictionary { { "pageNumber", "" } }, new AjaxOptions { UpdateTargetId = "ChargeList", HttpMethod = "Get", InsertionMode = InsertionMode.Replace }, new RouteValueDictionary { { "id", "searchForm" }, { "class", "form-inline well" } }))
     {
         <span>种类：</span>
@@ -26,6 +26,8 @@
                      (new SelectListItem() {Text = "收入", Value = "收入"}),
                      (new SelectListItem() {Text = "支出", Value = "支出"})
                     }, new { @class = "form-control" })
+        <span>年月:</span>
+    <input type="text" name="selectTime" placeholder="该日期所在年月的所有收支" class="form-control" id="YearMonth" value="" />
         <input type="submit" value="搜索(S)" accesskey="S" class="btn btn-default" />
     }
 </fieldset>

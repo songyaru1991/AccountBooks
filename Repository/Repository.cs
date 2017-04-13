@@ -1,4 +1,5 @@
 ﻿using AccountBooks.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -11,6 +12,8 @@ namespace AccountBooks.Repository
 {
     public class Repository<T>:IRepository<T> where T:class
     {
+        readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public IUnitOfWork UnitOfWork { get; set; }
         private readonly DataContext _db;
         private readonly DbSet<T> _dbSet;
@@ -84,19 +87,25 @@ namespace AccountBooks.Repository
 
 
         PagedList<ChargeModels> IRepository<T>.ShowAllRecordsByPagination(int pageNumber, int pageSize)
-        {
+        {  //c# Linq及Lamda表达式应用经验之 GroupBy 分组:http://www.cnblogs.com/han1982/p/4138163.html
+           // var query = _db.Charge.GroupBy(q => q.Date.Year).Select(q => (new { Date = q.Key, count = q.Count(), Amount = q.Sum(item => item.Amount) }));
             PagedList<ChargeModels> lst= _db.Charge.OrderBy(p => p.Date).ToPagedList(pageNumber, pageSize);
             return lst;
         }
 
-        PagedList<ChargeModels> IRepository<T>.ajaxSearchGetResult(string Category, int pageSize, int pageNumber)
+        //LINQ基本语法及其示例 http://blog.csdn.net/ycwol/article/details/42102939
+        PagedList<ChargeModels> IRepository<T>.ajaxSearchGetResult(string year, string month, string Category, DateTime selectDate, int pageSize, int pageNumber)
         {
-            //List<ChargeModels> ChargeList = _db.Charge.Where(p => (string.IsNullOrEmpty(Category) ? true : p.Category.Contains(Category))).ToList();
-            //PagedList<ChargeModels> ChargePagedList = ChargeList.OrderBy(p => p.Date).ToPagedList(pageNumber, pageSize);
+           // logger.Error("This is log4net test");
             var query = _db.Charge.AsEnumerable();
             if (!string.IsNullOrWhiteSpace(Category))
-                query = query.Where(q => q.Category.Contains(Category));
-            var model = query.OrderByDescending(p => p.Date).ToPagedList(pageNumber, pageSize);
+                  query = query.Where(q => q.Category.Contains(Category));
+            if (selectDate.Year>=1900)//既日期不为空时
+                  query = query.Where(q => q.Date.Year == selectDate.Year && q.Date.Month == selectDate.Month);
+            if (!string.IsNullOrWhiteSpace(year) || !string.IsNullOrWhiteSpace(month))
+                query = query.Where(q => q.Date.Year.ToString().Contains(year) && q.Date.Month.ToString().Contains(month));
+
+            var model = query.OrderByDescending(p => p.Date).ToPagedList(pageNumber, pageSize);          
             return model;
         }
 

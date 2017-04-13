@@ -1,0 +1,4 @@
+[Header]\r\n[Footer]\r\n[Header]\r\n2017/04/11 13:52:06 [13] INFO  AccountBooks.Repository.Repository`1 [(null)]  - This is log4net test
+2017/04/11 13:52:13 [7] INFO  AccountBooks.Repository.Repository`1 [(null)]  - This is log4net test
+2017/04/11 13:58:32 [12] INFO  AccountBooks.Repository.Repository`1 [(null)]  - This is log4net test
+2017/04/11 14:01:02 [12] INFO  AccountBooks.Repository.Repository`1 - This is log4net test

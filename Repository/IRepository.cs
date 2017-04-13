@@ -12,7 +12,7 @@ namespace AccountBooks.Repository
     {
   //      IUnitOfWork UnitOfWork { get; set; }
         PagedList<ChargeModels> ShowAllRecordsByPagination(int pageNumber, int pageSize);
-        PagedList<ChargeModels> ajaxSearchGetResult(string Category,int pageNumber, int pageSize);        
+        PagedList<ChargeModels> ajaxSearchGetResult(string year, string month, string Category, DateTime selectDate, int pageNumber, int pageSize);        
         IEnumerable<T> FindAll(Func<T, bool> exp);
         void Add(T entity);
         void Modify(T entity);
