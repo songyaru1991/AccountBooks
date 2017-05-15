@@ -12,11 +12,9 @@ namespace AccountBooks.Repository
     /// </summary>
     public interface IUnitOfWork : IDisposable
     {
-        #region
-  //      IRepository<T> Repository<T>() where T : class;
+        IRepository<T> Repository<T>() where T : class;
         DataContext dbContext{ get; set; }
         bool Commit();
 //        void Save();
-        #endregion
     }
 }

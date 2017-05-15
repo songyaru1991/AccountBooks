@@ -59,6 +59,7 @@ namespace AccountBooks.Controllers
             return View();
         }  
         */
+        //[ValidateAntiForgeryToken]
         public ActionResult Add(ChargeModels charge)
         {
             if (ModelState.IsValid)

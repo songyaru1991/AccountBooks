@@ -87,6 +87,6 @@ D:\Projects\WEB_MVC_TEST\AccountBooks\bin\zh-Hans\Microsoft.Owin.Security.Facebo
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\zh-Hans\Microsoft.Owin.Security.Google.resources.dll
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\zh-Hans\Microsoft.Owin.Security.Twitter.resources.dll
 D:\Projects\WEB_MVC_TEST\AccountBooks\bin\zh-Hans\Microsoft.Owin.Security.MicrosoftAccount.resources.dll
+D:\Projects\WEB_MVC_TEST\AccountBooks\obj\Debug\AccountBooks.csprojResolveAssemblyReference.cache
 D:\Projects\WEB_MVC_TEST\AccountBooks\obj\Debug\AccountBooks.dll
 D:\Projects\WEB_MVC_TEST\AccountBooks\obj\Debug\AccountBooks.pdb
-D:\Projects\WEB_MVC_TEST\AccountBooks\obj\Debug\AccountBooks.csprojResolveAssemblyReference.cache

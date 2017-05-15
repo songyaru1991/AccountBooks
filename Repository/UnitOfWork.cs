@@ -8,6 +8,10 @@ using System.Web;
 
 namespace AccountBooks.Repository
 {
+    /// <summary>
+    /// 此类将负责创建数据上下文实例,并移交到控制器的所有repository实例。
+    /// 为了给各个实体维护一个共同的DbContext上下文对象，保证所有的操作都是在共同的上下文中进行
+    /// </summary>
     public class UnitOfWork : IUnitOfWork, IDisposable   //IDisposable垃圾资源回收机制
     {
         public DataContext dbContext { get; set; }

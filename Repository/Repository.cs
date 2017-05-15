@@ -18,6 +18,7 @@ namespace AccountBooks.Repository
         private readonly DataContext _db;
         private readonly DbSet<T> _dbSet;
         #region 构造函数
+       // Repository类将从类的外面得到DbContext对象（每当它被创建时）
         public Repository(IUnitOfWork unitOfWork)
         {
             this._db = unitOfWork.dbContext;

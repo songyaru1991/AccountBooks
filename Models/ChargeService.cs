@@ -10,7 +10,6 @@ namespace AccountBooks.Models
 {
     public class ChargeService
     {
-  //      private IUnitOfWork UnitofWork { get; set; }
         private IUnitOfWork _unitWork;
         private IRepository<ChargeModels> _accountBookRep;
 
